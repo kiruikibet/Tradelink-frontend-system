@@ -1,0 +1,109 @@
+import { FiTruck, FiRefreshCw, FiPhone, FiSearch, FiHeart, FiShoppingCart, FiUser, FiChevronDown } from "react-icons/fi";
+import { MdCompareArrows } from "react-icons/md";
+
+function Navbar() {
+  return (
+    <header className="w-full bg-white">
+      {/* Top Green Bar */}
+      <div className="bg-green-800 text-white text-sm">
+        <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <span className="flex items-center gap-2">
+              <FiTruck /> Free Delivery on orders over KSh 5,000
+            </span>
+
+            <span className="hidden md:flex items-center gap-2">
+              <FiRefreshCw /> Scam detection & Transparent transactions
+            </span>
+
+            <span className="hidden lg:flex items-center gap-2">
+              <FiPhone /> Need Help? +254 700 123 456
+            </span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            <a href="#">Track Order</a>
+            <span>|</span>
+            <a href="#">Help & Support</a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navbar */}
+      <div className="border-b border-gray-200 ">
+        <div className="max-w-7xl mx-auto px-6 py-2 flex items-center gap-8">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 border-2 border-green-700 rounded-xl flex items-center justify-center text-green-700 font-bold">
+              TL
+            </div>
+            <h1 className="text-3xl font-bold">
+              Trade<span className="text-green-700">Link</span>
+            </h1>
+          </div>
+
+          {/* Category + Search */}
+          <div className="flex-1 hidden lg:flex items-center gap-4">
+            
+
+            <div className="flex flex-1 h-12 border border-gray-300 rounded-lg overflow-hidden">
+              <input
+                type="text"
+                placeholder="Search for products, brands and more..."
+                className="flex-1 px-5 outline-none text-gray-700"
+              />
+              <button className="w-16 bg-green-800 text-white flex items-center justify-center text-xl">
+                <FiSearch />
+              </button>
+            </div>
+          </div>
+
+          {/* Right Actions */}
+          <div className="hidden lg:flex items-center gap-6">
+            <button className="flex items-center gap-2 font-medium">
+              <FiHeart className="text-2xl" /> Wishlist
+            </button>
+            <button className="relative flex items-center gap-2 font-medium">
+              <FiShoppingCart className="text-2xl" />
+              <span className="absolute -top-3 left-4 bg-green-700 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                0
+              </span>
+              Cart
+            </button>
+
+            <button className="bg-green-800 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-semibold">
+              <FiUser /> Login / Register
+            </button>
+          </div>
+
+          {/* Mobile Search Icon */}
+          <button className="lg:hidden ml-auto text-2xl">
+            <FiSearch />
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Nav Links */}
+      <nav className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 h-8 flex items-center gap-10 overflow-x-auto text-sm font-semibold">
+          <a href="#">Deals</a>
+          <a href="#">New Arrivals</a>
+          <a href="#">Best Sellers</a>
+          <a href="#">Electronics</a>
+          <a href="#">Phones</a>
+          <a href="#">Home & Kitchen</a>
+          <a href="#">Fashion</a>
+          <a href="#">Beauty</a>
+          <a href="#">Sports</a>
+          <a href="#">Toys & Games</a>
+          <a href="#">Automotive</a>
+          <a href="#" className="flex items-center gap-1">
+            More <FiChevronDown />
+          </a>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+export default Navbar;
