@@ -1,16 +1,145 @@
-# React + Vite
+# TradeLink Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+TradeLink Frontend is the client-side application for the TradeLink marketplace platform.  
+It allows users to browse products, communicate with sellers, manage orders, and interact with the marketplace through a modern responsive interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend is built using React, Vite, Tailwind CSS, and React Router.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Tech Stack
 
-## Expanding the ESLint configuration
+- React
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+- React Icons
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+# Features
+
+## Public Features
+
+- Homepage
+- Marketplace browsing
+- Product details
+- Search products
+- Categories
+- User registration
+- User login
+- Google authentication
+- Seller profiles
+
+---
+
+## User Features
+
+- User dashboard
+- Wishlist
+- Cart
+- Checkout
+- Order tracking
+- Messaging system
+- Followers and following
+- Account settings
+
+---
+
+## Seller Features
+
+- Seller dashboard
+- Add product
+- Manage products
+- Manage orders
+- Seller analytics
+
+---
+
+## Admin Features
+
+- User management
+- Seller management
+- Product management
+- Orders management
+- Coupons
+- Banners
+- Reviews
+- Transactions
+- Disputes
+- Settings
+- Integrations
+- Backup & Restore
+
+---
+
+# Project Structure
+
+```bash
+src/
+├── assets/
+├── components/
+├── pages/
+├── layouts/
+├── routes/
+├── services/
+├── hooks/
+├── context/
+├── data/
+├── utils/
+```
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/tradelink-frontend.git
+```
+
+---
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Run Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# Environment Variables
+
+Create `.env` file:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api
+```
+
+---
+
+# Future Improvements
+
+- Real-time chat
+- Notifications
+- AI recommendations
+- Mobile app version
+- Advanced analytics
+
+---
+
+# Author
+
+Kirui
