@@ -38,7 +38,7 @@ function ProductSection({ title, timer, unlimited = false ,limit }) {
                 ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 max-h-[650px] overflow-y-auto pr-2"
                 : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 overflow-hidden"
         }
-    >
+      >
         {visibleProducts.map((product, index) => (
           <div
             key={index}
