@@ -3,6 +3,7 @@ import HeroSection from "../../components/home/Hero";
 import ProductGrid from "../../components/products/ProductGrid";
 import Footer from "../../components/layout/Footer";
 import { products } from "../../data/products";
+import MarketplaceFilters from "../../components/home/SidebarFilter";
 
 function Home() {
   return (
@@ -42,35 +43,7 @@ function Home() {
   <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
     
     {/* Sidebar */}
-    <aside className="border border-gray-200 rounded-xl p-5 h-fit">
-      <h3 className="font-bold mb-4">Marketplace Filters</h3>
-
-      <div className="space-y-4">
-        
-        <input
-          type="text"
-          placeholder="Search marketplace..."
-          className="w-full border border-gray-300 rounded-lg px-4 py-3"
-        />
-
-        <select className="w-full border border-gray-300 rounded-lg px-4 py-3">
-          <option>All Locations</option>
-          <option>Nairobi</option>
-          <option>Mombasa</option>
-          <option>Kisumu</option>
-        </select>
-
-        <select className="w-full border border-gray-300 rounded-lg px-4 py-3">
-          <option>Condition</option>
-          <option>New</option>
-          <option>Used</option>
-        </select>
-
-        <button className="w-full bg-green-700 text-white py-3 rounded-lg">
-          Apply Filters
-        </button>
-      </div>
-    </aside>
+   <MarketplaceFilters />
 
     {/* Marketplace Products */}
     <section className="lg:col-span-3">
