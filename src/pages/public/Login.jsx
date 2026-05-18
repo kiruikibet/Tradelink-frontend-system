@@ -1,7 +1,59 @@
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import {useState} from "react";
 
 function Login() {
+  const navigate = useNavigate();
+
+  const[formData, setFormData] = useState({
+    usernameOrEmail: '',
+    password: '',
+    rememberMe: false,
+  });
+
+  const [error , setError] = useState('');
+  
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    });
+   };
+   
+   const handlelogin = async (e) => {
+    e.preventDefault();
+    setError('');  
+
+    try {
+      const response = await fetch('http://127.0.1:8000/api/auth/login/', {   
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', 
+    },
+    body:JSON.stringify({
+      username: formData.usernameOrEmail,
+      password: formData.password,
+    }),
+  });
+  
+  const data = await response.json();
+  if(response.ok){
+    localStorage.setItem('token', data.access);
+    localStorage.setItem('refresh', data.refresh);
+    navigate('/');
+    window.location.reload();
+
+  }else{
+    setError(data.detail || 'Login failed. Please check your credentials and try again.');
+  }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('An error occurred in the server.');
+    }
+    };
+
+
+
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-2 overflow-hidden">
@@ -13,12 +65,20 @@ function Login() {
           <p className="text-gray-500 mt-2">
             Login to continue buying, selling, and chatting with sellers.
           </p>
+          {error && 
+          <p className="text-red-600 mt-2">{error}
+          </p>}
 
-          <form className="mt-8 space-y-5">
+          <form className="mt-8 space-y-5"
+            onSubmit={handlelogin}
+          >
             <div>
               <label className="text-sm font-medium">Email or Username</label>
               <input
                 type="text"
+                name="usernameOrEmail"
+                value={formData.usernameOrEmail}
+                onChange={handleChange}
                 placeholder="Enter email or username"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
               />
@@ -27,7 +87,11 @@ function Login() {
             <div>
               <label className="text-sm font-medium">Password</label>
               <input
+              
                 type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Enter password"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
               />
@@ -44,7 +108,8 @@ function Login() {
               </Link>
             </div>
 
-            <button className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold">
+            <button className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold"
+              type="submit">
               Login
             </button>
           </form>

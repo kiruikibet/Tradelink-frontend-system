@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   FiTruck,
   FiRefreshCw,
@@ -14,14 +15,46 @@ import {
 import { MdCompareArrows } from "react-icons/md";
 
 function Navbar() {
-  // temporary fake authentication
-  const isLoggedIn = true;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const[user, setUser] = useState(null);
 
-  const user = {
-    name: "Kirui",
-    avatar: "👨🏾‍💻",
-    trustPoints: 980,
-  };
+  useEffect(() => {
+    const getUser =async()=>{
+      const token= localStorage.getItem('token');
+      if(!token){
+        setIsLoggedIn(false);
+        setUser(null);
+        return;
+      }
+      try{
+        const response =await fetch('http://127.0.1:8000/api/user/profile/',{
+          method:'GET',
+          headers:{
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':'application/json'
+          }
+        });
+
+        const data = await response.json();
+        if(response.ok){
+          setIsLoggedIn(true);
+          setUser(data);
+        }else{
+          setIsLoggedIn(false);
+          setUser(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh');
+        }
+      }catch(error){
+        console.error('Error fetching user profile:', error);
+        setIsLoggedIn(false);
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh');
+      }
+   };  getUser();
+  },[]);
+
 
   return (
     <header className="w-full bg-white">

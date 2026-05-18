@@ -1,7 +1,60 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import {useState} from "react";
 
 function Register() {
+  const navigate= useNavigate();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    username: '',
+    email: '',
+    password: '',
+    password2: '',
+    agreeTerms: false,
+  });
+   const [error, setError] = useState('');  
+    const handleChange = (e) => { 
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+   };
+
+   const handleRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password.length < 6 && formData.password !==formData.password2) {
+      setError('Password must be at least 6 characters and match the confirmation.');
+      return;
+    }
+    try{
+       const response = await fetch('http://127.0.1:8000/api/auth/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: formData.fullName,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+  
+        }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate('/login');
+      } else {
+        setError(data.detail || 'Registration failed. Please check your information and try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      setError('An error occurred in the server.');
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-2 overflow-hidden">
@@ -25,11 +78,17 @@ function Register() {
           <p className="text-gray-500 mt-2">
             Join the marketplace and start trading today.
           </p>
+          {error && 
+          <p className="text-red-600 mt-2">{error}
+          </p>}
 
-          <form className="mt-8 space-y-4">
+          <form className="mt-8 space-y-4" onSubmit={handleRegister}>
             <div>
               <label className="text-sm font-medium">Full Name</label>
               <input
+                  name="fullName" 
+                  value={formData.fullName}
+                  onChange={handleChange}   
                 type="text"
                 placeholder="Enter full name"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
@@ -39,6 +98,9 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Username</label>
               <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange} 
                 type="text"
                 placeholder="Choose username"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
@@ -48,6 +110,9 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Email</label>
               <input
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 type="email"
                 placeholder="Enter email"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
@@ -57,8 +122,22 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Password</label>
               <input
+                name = "password"
+                value = {formData.password}
+                onChange = {handleChange}
                 type="password"
                 placeholder="Create password"
+                className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium"> Confirm Password</label>
+              <input
+                name = "password2"
+                value = {formData.password2}
+                onChange = {handleChange}
+                type="password"
+                placeholder="Confirm password"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
               />
             </div>
@@ -68,7 +147,9 @@ function Register() {
               I agree to the Terms and Privacy Policy.
             </label>
 
-            <button className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold">
+            <button
+            type= "submit"
+             className="w-full bg-green-800 text-white py-3 rounded-lg font-semibold">
               Create Account
             </button>
           </form>
