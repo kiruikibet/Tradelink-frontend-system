@@ -86,9 +86,10 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Full Name</label>
               <input
-                  name="fullName" 
-                  value={formData.fullName}
-                  onChange={handleChange}   
+                required
+                name="fullName" 
+                value={formData.fullName}
+                onChange={handleChange}   
                 type="text"
                 placeholder="Enter full name"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
@@ -98,9 +99,10 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Username</label>
               <input
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange} 
+                required
+                name="username"
+                value={formData.username}
+                onChange={handleChange} 
                 type="text"
                 placeholder="Choose username"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
@@ -110,7 +112,7 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Email</label>
               <input
-                name="email"
+                required
                 value={formData.email}
                 onChange={handleChange}
                 type="email"
@@ -122,6 +124,7 @@ function Register() {
             <div>
               <label className="text-sm font-medium">Password</label>
               <input
+                required
                 name = "password"
                 value = {formData.password}
                 onChange = {handleChange}
@@ -133,6 +136,7 @@ function Register() {
             <div>
               <label className="text-sm font-medium"> Confirm Password</label>
               <input
+                required
                 name = "password2"
                 value = {formData.password2}
                 onChange = {handleChange}

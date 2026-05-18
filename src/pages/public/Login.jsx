@@ -75,6 +75,7 @@ function Login() {
             <div>
               <label className="text-sm font-medium">Email or Username</label>
               <input
+                required
                 type="text"
                 name="usernameOrEmail"
                 value={formData.usernameOrEmail}
@@ -87,7 +88,7 @@ function Login() {
             <div>
               <label className="text-sm font-medium">Password</label>
               <input
-              
+                required              
                 type="password"
                 name="password"
                 value={formData.password}
