@@ -4,8 +4,14 @@ import ProductGrid from "../../components/products/ProductGrid";
 import Footer from "../../components/layout/Footer";
 import { products } from "../../data/products";
 import MarketplaceFilters from "../../components/home/SidebarFilter";
+import { useAuth } from "../../context/AuthContext";
 
 function Home() {
+  const { user, loading } = useAuth();
+
+if (loading) {
+  return <h2 className="p-10">Loading...</h2>;
+}
   return (
     <div className="bg-white min-h-screen">
       <Navbar />
@@ -16,11 +22,15 @@ function Home() {
   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
     
     <div>
-      <h2 className="text-2xl font-bold">Marketplace</h2>
+      <h2 className="text-2xl font-bold">
+  {user ? `Welcome back, ${user.username}` : "Marketplace"}
+</h2>
 
-      <p className="text-gray-500 mt-1">
-        Discover listings from trusted sellers around Kenya.
-      </p>
+<p className="text-gray-500 mt-1">
+  {user
+    ? "Here are recommendations selected for your account."
+    : "Discover listings from trusted sellers around Kenya."}
+</p>
     </div>
 
     <div className="flex gap-3">

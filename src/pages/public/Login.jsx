@@ -1,8 +1,11 @@
 import { Link,useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import {useState} from "react";
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
+  const { login } = useAuth();
+  
   const navigate = useNavigate();
 
   const[formData, setFormData] = useState({
@@ -20,37 +23,17 @@ function Login() {
     });
    };
    
-   const handlelogin = async (e) => {
+  const handlelogin = async (e) => {
     e.preventDefault();
-    setError('');  
+    setError("");
 
     try {
-      const response = await fetch('http://127.0.1:8000/api/auth/login/', {   
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', 
-    },
-    body:JSON.stringify({
-      username: formData.usernameOrEmail,
-      password: formData.password,
-    }),
-  });
-  
-  const data = await response.json();
-  if(response.ok){
-    localStorage.setItem('token', data.access);
-    localStorage.setItem('refresh', data.refresh);
-    navigate('/');
-    window.location.reload();
-
-  }else{
-    setError(data.detail || 'Login failed. Please check your credentials and try again.');
-  }
+      await login(formData.usernameOrEmail, formData.password);
+      navigate("/");
     } catch (error) {
-      console.error('Error during login:', error);
-      setError('An error occurred in the server.');
-    }
-    };
+      setError(error.message);
+      }
+};
 
 
 

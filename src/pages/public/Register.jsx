@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import {useState} from "react";
+import { useAuth } from "../../context/AuthContext";
 
 function Register() {
+  const { register } = useAuth();
   const navigate= useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -20,41 +22,27 @@ function Register() {
     });
    };
 
-   const handleRegister = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleRegister = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (formData.password.length < 6 && formData.password !==formData.password2) {
-      setError('Password must be at least 6 characters and match the confirmation.');
-      return;
-    }
-    try{
-       const response = await fetch('http://127.0.1:8000/api/auth/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          full_name: formData.fullName,
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-  
-        }),
-      });
-      const data = await response.json();
+  if (formData.password.length < 8) {
+    setError("Password must be at least 8 characters.");
+    return;
+  }
 
-      if (response.ok) {
-        navigate('/login');
-      } else {
-        setError(data.detail || 'Registration failed. Please check your information and try again.');
-      }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      setError('An error occurred in the server.');
-    }
-  };
+  if (formData.password !== formData.password2) {
+    setError("Passwords do not match.");
+    return;
+  }
 
+  try {
+    await register(formData.username, formData.email, formData.password);
+    navigate("/");
+  } catch (error) {
+    setError(error.message);
+  }
+};
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-2 overflow-hidden">
@@ -113,6 +101,7 @@ function Register() {
               <label className="text-sm font-medium">Email</label>
               <input
                 required
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
                 type="email"

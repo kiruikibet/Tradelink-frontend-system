@@ -13,48 +13,11 @@ import {
   FiBell,
 } from "react-icons/fi";
 import { MdCompareArrows } from "react-icons/md";
+import {useAuth} from "../../context/AuthContext";
 
 function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const[user, setUser] = useState(null);
-
-  useEffect(() => {
-    const getUser =async()=>{
-      const token= localStorage.getItem('token');
-      if(!token){
-        setIsLoggedIn(false);
-        setUser(null);
-        return;
-      }
-      try{
-        const response =await fetch('http://127.0.1:8000/api/user/profile/',{
-          method:'GET',
-          headers:{
-            'Authorization': `Bearer ${token}`,
-            'Content-Type':'application/json'
-          }
-        });
-
-        const data = await response.json();
-        if(response.ok){
-          setIsLoggedIn(true);
-          setUser(data);
-        }else{
-          setIsLoggedIn(false);
-          setUser(null);
-          localStorage.removeItem('token');
-          localStorage.removeItem('refresh');
-        }
-      }catch(error){
-        console.error('Error fetching user profile:', error);
-        setIsLoggedIn(false);
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh');
-      }
-   };  getUser();
-  },[]);
-
+  const {user,logout}=useAuth();
+  const isLoggedIn =!!user;
 
   return (
     <header className="w-full bg-white">
@@ -142,13 +105,13 @@ function Navbar() {
                 className="flex items-center gap-3 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50"
               >
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">
-                  {user.avatar}
+                  {user.username?.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="text-left">
-                  <p className="text-sm font-semibold">{user.name}</p>
+                  <p className="text-sm font-semibold">{user.username}</p>
                   <p className="text-xs text-green-700 font-medium">
-                    {user.trustPoints} Trust Points
+                    Account
                   </p>
                 </div>
               </Link>
