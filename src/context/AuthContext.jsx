@@ -1,30 +1,33 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getProfile, loginUser, registerUser } from "../services/api";
+import { useNavigate, } from "react-router-dom";
 
 const AuthContext = createContext();
+
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
- async function login(username, password) {
-  await loginUser(username, password);
+ async function login(username_or_email, password) {
+  await loginUser(username_or_email, password);
 
   const profile = await getProfile();
   console.log("PROFILE RESPONSE:", profile);
 
   setUser(profile.user);
-}
+  }
 
-  async function register(username, email, password) {
-    await registerUser(username, email, password);
-    await login(username, password);
+  async function register(username,first_name,last_name, email, password) {
+    await registerUser(username,first_name,last_name, email, password);
+    await login(email, password);
   }
 
   function logout() {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     setUser(null);
+    console.log("user Loged out");
   }
 
   useEffect(() => {

@@ -3,13 +3,19 @@ import Footer from "../../components/layout/Footer";
 import {ProfileProductGrid} from "../../components/products/ProductGrid";
 import { products } from "../../data/products";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
+  const navigate= useNavigate();
 
-const { user, loading } = useAuth();
+const { user, loading, logout } = useAuth();
 
 if (loading) return <h2>Loading...</h2>;
 if (!user) return <h2>Please login first.</h2>;
+ function handlelogout(){
+   logout();
+   navigate("/");
+ }
 
 const profileUser = {
   name: user.username,
@@ -76,6 +82,7 @@ const profileUser = {
                 <Stat number={profileUser.rating} label="Rating" />
                 <Stat number={profileUser.sold} label="Products Sold" />
               </div>
+               <button onClick={handlelogout}>Logout</button>
             </div>
           </div>
 

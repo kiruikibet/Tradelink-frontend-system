@@ -7,22 +7,33 @@ function Register() {
   const { register } = useAuth();
   const navigate= useNavigate();
   const [formData, setFormData] = useState({
-    fullName: '',
+    first_name:'',
+    last_name:'',
     username: '',
     email: '',
     password: '',
     password2: '',
     agreeTerms: false,
   });
-   const [error, setError] = useState('');  
-    const handleChange = (e) => { 
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-   };
+  const [error, setError] = useState(''); 
 
-const handleRegister = async (e) => {
+  const capitalize=(word)=>{
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData({
+    ...formData,
+    [name]:
+      name === "first_name" || name === "last_name"
+        ? capitalize(value)
+        : value,
+  });
+};
+
+   const handleRegister = async (e) => {
   e.preventDefault();
   setError("");
 
@@ -37,7 +48,7 @@ const handleRegister = async (e) => {
   }
 
   try {
-    await register(formData.username, formData.email, formData.password);
+    await register(formData.username,formData.first_name,formData.last_name,formData.email, formData.password);
     navigate("/");
   } catch (error) {
     setError(error.message);
@@ -72,17 +83,30 @@ const handleRegister = async (e) => {
 
           <form className="mt-8 space-y-4" onSubmit={handleRegister}>
             <div>
-              <label className="text-sm font-medium">Full Name</label>
+              <label className="text-sm font-medium">First Name</label>
               <input
                 required
-                name="fullName" 
-                value={formData.fullName}
+                name="first_name" 
+                value={formData.first_name}
                 onChange={handleChange}   
                 type="text"
-                placeholder="Enter full name"
+                placeholder="Enter last name"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
               />
             </div>
+                        <div>
+              <label className="text-sm font-medium">Last Name</label>
+              <input
+                required
+                name="last_name" 
+                value={formData.last_name}
+                onChange={handleChange}   
+                type="text"
+                placeholder="Enter last name"
+                className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
+              />
+            </div>
+            
 
             <div>
               <label className="text-sm font-medium">Username</label>
