@@ -1,7 +1,7 @@
-const BASE_URL = "http://127.0.0.1:8000/api/auth";
+const BASE_URL = "http://127.0.0.1:8000";
 
 export async function registerUser(username,first_name,last_name, email, password) {
-  const response = await fetch(`${BASE_URL}/register/`, {
+  const response = await fetch(`${BASE_URL}/api/auth/register/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -24,7 +24,7 @@ export async function registerUser(username,first_name,last_name, email, passwor
 }
 
 export async function loginUser(username_or_email, password) {
-  const response = await fetch(`${BASE_URL}/login/`, {
+  const response = await fetch(`${BASE_URL}/api/auth/login/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export async function loginUser(username_or_email, password) {
 export async function getProfile() {
   const token = localStorage.getItem("access");
 
-  const response = await fetch(`${BASE_URL}/profile/`, {
+  const response = await fetch(`${BASE_URL}/api/auth/profile/`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -58,6 +58,24 @@ export async function getProfile() {
 
   if (!response.ok) {
     throw new Error("Not authenticated");
+  }
+
+  return data;
+}
+export async function get_products() {
+  const token = localStorage.getItem("access");
+
+  const response = await fetch(`${BASE_URL}/api/products/products/`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
   }
 
   return data;

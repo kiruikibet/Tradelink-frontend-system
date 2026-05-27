@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getProfile, loginUser, registerUser } from "../services/api";
+import { getProfile, loginUser, registerUser,get_products } from "../services/api";
 import { useNavigate, } from "react-router-dom";
+import { products } from "../data/products";
+
 
 const AuthContext = createContext();
 
@@ -16,6 +18,10 @@ export function AuthProvider({ children }) {
   console.log("PROFILE RESPONSE:", profile);
 
   setUser(profile.user);
+  const products = await get_products();
+  console.log(products);
+  
+
   }
 
   async function register(username,first_name,last_name, email, password) {
