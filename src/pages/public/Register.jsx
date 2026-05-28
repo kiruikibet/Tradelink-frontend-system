@@ -1,7 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import {useState} from "react";
+import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { capitalize } from "../../utils/helpers";
+import { validateRegister } from "../../utils/validators";
 
 function Register() {
   const { register } = useAuth();
@@ -37,18 +39,14 @@ const handleChange = (e) => {
   e.preventDefault();
   setError("");
 
-  if (formData.password.length < 8) {
-    setError("Password must be at least 8 characters.");
-    return;
-  }
-
-  if (formData.password !== formData.password2) {
-    setError("Passwords do not match.");
+  const validationError = validateRegister(formData);
+  if (validationError) {
+    setError(validationError);
     return;
   }
 
   try {
-    await register(formData.username,formData.first_name,formData.last_name,formData.email, formData.password);
+    await register(formData.username, formData.first_name, formData.last_name, formData.email, formData.password);
     navigate("/");
   } catch (error) {
     setError(error.message);

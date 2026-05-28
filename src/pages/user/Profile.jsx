@@ -1,126 +1,211 @@
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
-import {ProfileProductGrid} from "../../components/products/ProductGrid";
-import { products } from "../../data/products";
+import { ProfileProductGrid } from "../../components/products/ProductGrid";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useProducts } from "../../hooks/useProducts";
+import { useNavigate, Link } from "react-router-dom";
+import { useState, useRef } from "react";
+import { FiMapPin, FiLogOut, FiPlus } from "react-icons/fi";
+import { uploadToUploadThing } from "../../services/uploadService";
+import { updateAvatar } from "../../services/authService";
+import Loader from "../../components/common/Loader";
+import EmptyState from "../../components/common/EmptyState";
 
 function Profile() {
-  const navigate= useNavigate();
+  const navigate = useNavigate();
+  const { user, loading, logout } = useAuth();
+  const { products: allProducts, loading: productsLoading } = useProducts();
+  const [activeTab, setActiveTab] = useState("listings");
+  const [avatarUrl, setAvatarUrl] = useState(user?.profile_picture || null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef(null);
 
-const { user, loading, logout } = useAuth();
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-if (loading) return <h2>Loading...</h2>;
-if (!user) return <h2>Please login first.</h2>;
- function handlelogout(){
-   logout();
-   navigate("/");
- }
+    // Show local preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setAvatarUrl(localUrl);
+    setAvatarUploading(true);
 
-const profileUser = {
-  name: user.username,
-  username: `@${user.username}`,
-  avatar: user.username?.charAt(0).toUpperCase(),
-  coverPost: "🛋️ 🪴 💡",
-  bio: "Welcome to my TradeLink account.",
-  location: "Kenya",
-  joined: "New member",
-  posts: 0,
-  followers: 0,
-  following: 0,
-  rating: 0,
-  sold: 0,
-};
+    try {
+      // 1. Upload to UploadThing
+      const imageUrl = await uploadToUploadThing(file);
+
+      // 2. Send URL to backend
+      await updateAvatar(imageUrl);
+
+      setAvatarUrl(imageUrl);
+    } catch {
+      // revert preview on failure
+      setAvatarUrl(user?.profile_picture || null);
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  if (loading) return <Loader fullScreen />;
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
+
+  // filter to only this user's products
+  const myProducts = allProducts.filter((p) => p.user === user.username);
+
+  const displayName = user.first_name
+    ? `${user.first_name} ${user.last_name || ""}`.trim()
+    : user.username;
+
+  const tabs = [
+    { key: "listings", label: "Listings" },
+    { key: "reviews", label: "Reviews" },
+    { key: "saved", label: "Saved" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-8">
-        <section className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-          {/* Profile post / cover image */}
-          <div className="h-48 bg-gradient-to-r from-green-950 to-gray-900 relative flex items-center justify-end pr-16 text-7xl">
-            <span className="opacity-70">{profileUser.coverPost}</span>
+      {/* ── Top profile banner ── */}
+      <div className="w-full bg-gradient-to-br from-green-900 via-green-800 to-gray-900">
+        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row md:items-end gap-6">
 
-            <button className="absolute right-6 bottom-5 bg-white px-4 py-2 rounded-lg shadow text-sm font-semibold">
-              Edit Profile
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-700 flex items-center justify-center text-6xl font-bold text-white shadow-xl ring-4 ring-white/20 select-none overflow-hidden">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+              ) : (
+                user.username?.charAt(0).toUpperCase()
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={avatarUploading}
+              className="absolute bottom-1 right-1 w-9 h-9 bg-green-500 hover:bg-green-400 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white transition disabled:opacity-60"
+            >
+              {avatarUploading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <FiPlus size={18} />
+              )}
             </button>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
           </div>
 
-          {/* Profile info */}
-          <div className="px-6 pb-5">
-            <div className="flex flex-col md:flex-row md:justify-between gap-6 -mt-14">
-              <div className="flex gap-5">
-                <div className="relative">
-                  <div className="w-28 h-28 rounded-full bg-green-100 border-4 border-white shadow flex items-center justify-center text-6xl">
-                    {profileUser.avatar}
-                  </div>
+          {/* Info */}
+          <div className="flex-1 text-white">
+            <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
+            <p className="text-green-300 text-sm mt-0.5">@{user.username}</p>
+            <div className="flex items-center gap-1 text-green-400 text-xs mt-1">
+              <FiMapPin size={11} />
+              <span>Kenya</span>
+            </div>
+            <p className="text-gray-300 text-sm mt-3 max-w-lg leading-relaxed">
+              Welcome to my TradeLink store. Browse my listings and feel free to message me.
+            </p>
 
-                  <button className="absolute bottom-1 right-1 bg-gray-900 text-white w-8 h-8 rounded-full text-xs">
-                    📷
-                  </button>
+            {/* Stats */}
+            <div className="flex gap-8 mt-5">
+              {[[myProducts.length, "Listings"], ["128", "Followers"], ["64", "Following"], ["0", "Sold"]].map(([n, l]) => (
+                <div key={l} className="flex flex-col">
+                  <span className="text-xl font-bold">{n}</span>
+                  <span className="text-xs text-gray-400">{l}</span>
                 </div>
-
-                <div className="pt-16 md:pt-14">
-                  <h1 className="text-3xl font-bold">
-                    {profileUser.name} <span className="text-green-700 text-lg">●</span>
-                  </h1>
-
-                  <p className="text-sm text-gray-500">{profileUser.username}</p>
-                  <p className="text-sm text-gray-700 mt-2 max-w-xl">{profileUser.bio}</p>
-
-                  <div className="flex gap-4 text-sm text-gray-500 mt-3">
-                    <span>📍 {profileUser.location}</span>
-                    <span>📅 {profileUser.joined}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-5 border border-gray-200 rounded-xl bg-white h-fit mt-4 md:mt-20">
-                <Stat number={profileUser.posts} label="Posts" />
-                <Stat number={products.followers} label="Followers" />
-                <Stat number={profileUser.following} label="Following" />
-                <Stat number={profileUser.rating} label="Rating" />
-                <Stat number={profileUser.sold} label="Products Sold" />
-              </div>
-               <button onClick={handlelogout}>Logout</button>
+              ))}
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="border-t px-6 flex gap-8 text-sm font-medium">
-            <button className="py-4 border-b-2 border-green-700 text-green-700">
-              My Listings
+          {/* Action buttons */}
+          <div className="flex gap-3 shrink-0 self-start md:self-end">
+            <button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-semibold px-5 py-2.5 rounded-xl transition">
+              Edit Profile
             </button>
-            <button className="py-4 text-gray-600">Reviews</button>
-            <button className="py-4 text-gray-600">Saved Items</button>
-            <button className="py-4 text-gray-600">About</button>
-          </div>
-        </section>
-
-        {/* Posted products */}
-        <section className="mt-6 bg-white border border-gray-200 rounded-2xl p-6">
-          <h2 className="text-lg font-bold mb-5">My Posted Products</h2>
-
-          <ProfileProductGrid products={products.slice(0, 6)} />
-
-          <div className="flex justify-center mt-6">
-            <button className="bg-green-700 text-white px-6 py-2 rounded-lg text-sm font-semibold">
-              View All Listings
+            <Link
+              to="/products/create"
+              className="bg-green-500 hover:bg-green-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
+            >
+              + Create Product
+            </Link>
+            <button
+              onClick={() => { logout(); navigate("/"); }}
+              className="w-10 h-10 rounded-xl bg-white/10 hover:bg-red-500/30 text-red-300 flex items-center justify-center border border-white/10 transition"
+            >
+              <FiLogOut size={16} />
             </button>
           </div>
-        </section>
-      </main>
+        </div>
+
+        {/* Tabs */}
+        <div className="max-w-7xl mx-auto px-6 flex gap-1 border-t border-white/10">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-6 py-4 text-sm font-semibold border-b-2 transition ${
+                activeTab === tab.key
+                  ? "border-green-400 text-white"
+                  : "border-transparent text-gray-400 hover:text-gray-200"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Content area ── */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+
+        {activeTab === "listings" && (
+          <>
+            {productsLoading ? (
+              <div className="flex justify-center py-20">
+                <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : myProducts.length > 0 ? (
+              <>
+                <ProfileProductGrid products={myProducts} />
+                <div className="flex justify-center mt-8">
+                  <button className="text-sm text-green-700 font-semibold hover:underline">
+                    View all listings
+                  </button>
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                icon="🛍️"
+                title="No listings yet"
+                description="Create your first product to get started"
+                action={
+                  <Link to="/products/create" className="bg-green-600 text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-green-500 transition">
+                    + Create Product
+                  </Link>
+                }
+              />
+            )}
+          </>
+        )}
+
+        {activeTab === "reviews" && (
+          <EmptyState icon="⭐" title="No reviews yet" description="Reviews from buyers will appear here" />
+        )}
+
+        {activeTab === "saved" && (
+          <EmptyState icon="🔖" title="Nothing saved yet" description="Items you save will show up here" />
+        )}
+      </div>
 
       <Footer />
-    </div>
-  );
-}
-
-function Stat({ number, label }) {
-  return (
-    <div className="px-5 py-4 text-center border-r last:border-r-0">
-      <p className="font-bold">{number}</p>
-      <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
 }
