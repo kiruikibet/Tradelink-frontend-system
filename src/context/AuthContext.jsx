@@ -24,6 +24,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  function updateUser(updates) {
+    setUser((currentUser) => currentUser ? { ...currentUser, ...updates } : currentUser);
+  }
+
   useEffect(() => {
     async function checkLoggedInUser() {
       try {
@@ -41,7 +45,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -17,6 +17,7 @@ function ProductCard({ product }) {
   const seller = product.user ?? product.seller ?? "Seller";
   const category = product.category_name ?? product.category ?? "";
   const firstImage = resolveImage(product.images?.[0]?.image ?? null);
+  const sellerImage = resolveImage(product.user_profile_image ?? null);
   const fallback = "🛍️";
 
   return (
@@ -46,9 +47,18 @@ function ProductCard({ product }) {
 
         <p className="text-green-700 font-bold text-lg mt-1">{price}</p>
 
-        <p className="text-xs text-gray-600 mt-1 truncate">
-          Seller: <span className="font-semibold">{seller}</span>
-        </p>
+        <div className="flex items-center gap-2 mt-2 min-w-0">
+          <div className="w-7 h-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center overflow-hidden shrink-0 text-xs font-bold">
+            {sellerImage ? (
+              <img src={sellerImage} alt={seller} className="w-full h-full object-cover" />
+            ) : (
+              seller.charAt(0).toUpperCase()
+            )}
+          </div>
+          <p className="text-xs text-gray-600 truncate">
+            Seller: <span className="font-semibold">{seller}</span>
+          </p>
+        </div>
 
         {category && (
           <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
