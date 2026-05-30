@@ -1,17 +1,23 @@
 import { Link } from "react-router-dom";
 import { FiHeart, FiMapPin, FiMessageCircle } from "react-icons/fi";
+import { BASE_URL } from "../../utils/constants";
+
+function resolveImage(path) {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${BASE_URL}${path}`;
+}
 
 function ProductCard({ product }) {
-  // support both API shape and legacy mock shape
   const id = product.product_id ?? product.id;
   const name = product.name;
   const price = product.price
     ? `KSh ${Number(product.price).toLocaleString()}`
-    : product.price_display ?? "—";
+    : "—";
   const seller = product.user ?? product.seller ?? "Seller";
-  const category = product.category ?? product.location ?? "";
-  const firstImage = product.images?.[0]?.image ?? null;
-  const fallback = product.image ?? "🛍️";
+  const category = product.category_name ?? product.category ?? "";
+  const firstImage = resolveImage(product.images?.[0]?.image ?? null);
+  const fallback = "🛍️";
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
@@ -65,11 +71,11 @@ function ProductCard({ product }) {
 
 export function ProfileProductCard({ product }) {
   const id = product.product_id ?? product.id;
-  const firstImage = product.images?.[0]?.image ?? null;
-  const fallback = product.image ?? "🛍️";
+  const firstImage = resolveImage(product.images?.[0]?.image ?? null);
+  const fallback = "🛍️";
   const price = product.price
     ? `KSh ${Number(product.price).toLocaleString()}`
-    : product.price_display ?? "—";
+    : "—";
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition">

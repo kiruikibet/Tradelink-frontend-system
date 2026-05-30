@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import Navbar from "../../components/layout/Navbar";
 import { MAX_PRODUCT_IMAGES } from "../../utils/constants";
-import { uploadToUploadThing } from "../../services/uploadService";
+import { uploadToCloudinary } from "../../services/uploadService";
 import { createProduct, saveProductImage, getCategories } from "../../services/productService";
 
 function CreateProduct() {
@@ -49,6 +49,11 @@ function CreateProduct() {
       return;
     }
 
+    if (selectedFiles.length === 0) {
+      setError("Please upload at least one product image.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       setUploadProgress("Creating product...");
@@ -61,8 +66,8 @@ function CreateProduct() {
 
       for (let i = 0; i < selectedFiles.length; i++) {
         setUploadProgress(`Uploading image ${i + 1} of ${selectedFiles.length}...`);
-        const imageUrl = await uploadToUploadThing(selectedFiles[i]);
-        if (imageUrl) await saveProductImage(product.product_id, imageUrl);
+        const imageUrl = await uploadToCloudinary(selectedFiles[i]);
+        await saveProductImage(product.product_id, imageUrl);
       }
 
       navigate("/user/profile");

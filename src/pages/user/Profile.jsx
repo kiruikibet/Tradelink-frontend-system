@@ -6,7 +6,7 @@ import { useProducts } from "../../hooks/useProducts";
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import { FiMapPin, FiLogOut, FiPlus } from "react-icons/fi";
-import { uploadToUploadThing } from "../../services/uploadService";
+import { uploadToCloudinary } from "../../services/uploadService";
 import { updateAvatar } from "../../services/authService";
 import Loader from "../../components/common/Loader";
 import EmptyState from "../../components/common/EmptyState";
@@ -30,8 +30,8 @@ function Profile() {
     setAvatarUploading(true);
 
     try {
-      // 1. Upload to UploadThing
-      const imageUrl = await uploadToUploadThing(file);
+      // 1. Upload to Cloudinary
+      const imageUrl = await uploadToCloudinary(file);
 
       // 2. Send URL to backend
       await updateAvatar(imageUrl);

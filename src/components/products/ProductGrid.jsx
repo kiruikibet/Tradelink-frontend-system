@@ -5,7 +5,7 @@ function ProductGrid({ products }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.product_id ?? product.id} product={product} />
       ))}
     </div>
   );
@@ -14,7 +14,7 @@ export function ProfileProductGrid({ products }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {products.map((product) => (
-        <ProfileProductCard key={product.id} product={product} />
+        <ProfileProductCard key={product.product_id ?? product.id} product={product} />
       ))}
     </div>
   );

@@ -30,7 +30,10 @@ export async function saveProductImage(productId, imageUrl) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ product: productId, image: imageUrl }),
+    body: JSON.stringify({
+      product: productId,
+      image: imageUrl,
+    }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.detail || "Failed to save image");
