@@ -81,10 +81,6 @@ function Home() {
                 <ProductGrid products={paginatedProducts} />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-8 border-t border-gray-200 pt-5">
-                  <p className="text-sm text-gray-500">
-                    Showing {firstProductNumber}-{lastProductNumber} of {products.length} products
-                  </p>
-
                   <div className="flex items-center gap-2">
                     <button
                       type="button"

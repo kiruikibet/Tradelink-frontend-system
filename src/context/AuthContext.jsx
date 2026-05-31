@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser, getProfile } from "../services/authService";
+import { clearAuthTokens, getAccessToken } from "../services/apiClient";
 
 const AuthContext = createContext();
 
@@ -19,8 +20,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    clearAuthTokens();
     setUser(null);
   }
 
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function checkLoggedInUser() {
       try {
-        const token = localStorage.getItem("access");
+        const token = getAccessToken();
         if (!token) return;
         const profile = await getProfile();
         setUser(profile.user);

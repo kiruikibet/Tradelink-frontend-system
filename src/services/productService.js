@@ -1,48 +1,34 @@
-import { BASE_URL } from "../utils/constants";
+import { apiRequest } from "./apiClient";
 
 export async function getProducts() {
-  const response = await fetch(`${BASE_URL}/api/products/products/`);
-  const data = await response.json();
-  if (!response.ok) throw new Error("Failed to fetch products");
-  return data;
+  return apiRequest("/api/products/products/", {
+    errorMessage: "Failed to fetch products",
+  });
 }
 
 export async function createProduct(productData) {
-  const token = localStorage.getItem("access");
-  const response = await fetch(`${BASE_URL}/api/products/products/`, {
+  return apiRequest("/api/products/products/", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(productData),
+    auth: true,
+    body: productData,
+    errorMessage: "Failed to create product",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || JSON.stringify(data));
-  return data;
 }
 
 export async function saveProductImage(productId, imageUrl) {
-  const token = localStorage.getItem("access");
-  const response = await fetch(`${BASE_URL}/api/products/upload-image/`, {
+  return apiRequest("/api/products/upload-image/", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
+    auth: true,
+    body: {
       product: productId,
       image: imageUrl,
-    }),
+    },
+    errorMessage: "Failed to save image",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to save image");
-  return data;
 }
 
 export async function getCategories() {
-  const response = await fetch(`${BASE_URL}/api/products/categories/`);
-  const data = await response.json();
-  if (!response.ok) throw new Error("Failed to fetch categories");
-  return data;
+  return apiRequest("/api/products/categories/", {
+    errorMessage: "Failed to fetch categories",
+  });
 }

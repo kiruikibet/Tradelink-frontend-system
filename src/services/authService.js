@@ -1,55 +1,35 @@
-import { BASE_URL } from "../utils/constants";
+import { apiRequest, setAuthTokens } from "./apiClient";
 
 export async function registerUser(username, first_name, last_name, email, password) {
-  const response = await fetch(`${BASE_URL}/api/auth/register/`, {
+  return apiRequest("/api/auth/register/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, first_name, last_name, email, password }),
+    body: { username, first_name, last_name, email, password },
+    errorMessage: "Registration failed",
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      data.username?.[0] || data.email?.[0] || data.password?.[0] || "Registration failed"
-    );
-  }
-  return data;
 }
 
 export async function loginUser(username_or_email, password) {
-  const response = await fetch(`${BASE_URL}/api/auth/login/`, {
+  const data = await apiRequest("/api/auth/login/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username_or_email, password }),
+    body: { username_or_email, password },
+    errorMessage: "Invalid username or password",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Invalid username or password");
-  localStorage.setItem("access", data.access);
-  localStorage.setItem("refresh", data.refresh);
+  setAuthTokens(data);
   return data;
 }
 
 export async function getProfile() {
-  const token = localStorage.getItem("access");
-  const response = await fetch(`${BASE_URL}/api/auth/profile/`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
+  return apiRequest("/api/auth/profile/", {
+    auth: true,
+    errorMessage: "Not authenticated",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error("Not authenticated");
-  return data;
 }
 
 export async function updateAvatar(imageUrl) {
-  const token = localStorage.getItem("access");
-  const response = await fetch(`${BASE_URL}/api/auth/profile/update-avatar/`, {
+  return apiRequest("/api/auth/profile/update-avatar/", {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ profile_picture: imageUrl }),
+    auth: true,
+    body: { profile_picture: imageUrl },
+    errorMessage: "Failed to update avatar",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to update avatar");
-  return data;
 }
