@@ -49,10 +49,10 @@ function EditProfile() {
     setAvatarUrl(URL.createObjectURL(file));
     setAvatarUploading(true);
     try {
-      const imageUrl = await uploadImage(file);
-      await updateAvatar(imageUrl);
-      setAvatarUrl(imageUrl);
-      updateUser({ profile_picture: imageUrl });
+      const { url, public_id } = await uploadImage(file);
+      await updateAvatar(url, public_id);
+      setAvatarUrl(url);
+      updateUser({ profile_picture: url });
     } catch {
       setAvatarUrl(user?.profile_picture || null);
     } finally {

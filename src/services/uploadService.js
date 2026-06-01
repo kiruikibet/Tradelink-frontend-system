@@ -2,9 +2,9 @@ const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 /**
- * Upload a single file to Cloudinary and return the secure URL
+ * Upload a file to Cloudinary
  * @param {File} file
- * @returns {Promise<string>} image URL
+ * @returns {Promise<{ url: string, public_id: string }>}
  */
 export async function uploadImage(file) {
   const fd = new FormData();
@@ -18,5 +18,8 @@ export async function uploadImage(file) {
 
   if (!res.ok) throw new Error("Image upload failed");
   const data = await res.json();
-  return data.secure_url;
+  return {
+    url: data.secure_url,
+    public_id: data.public_id,
+  };
 }

@@ -25,11 +25,11 @@ export async function getProfile() {
   });
 }
 
-export async function updateAvatar(imageUrl) {
+export async function updateAvatar(imageUrl, publicId) {
   return apiRequest("/api/auth/profile/update-avatar/", {
     method: "PATCH",
     auth: true,
-    body: { profile_picture: imageUrl },
+    body: { profile_picture: imageUrl, public_id: publicId },
     errorMessage: "Failed to update avatar",
   });
 }
