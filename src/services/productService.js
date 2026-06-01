@@ -1,4 +1,4 @@
-import { apiRequest } from "./apiClient";
+import { apiRequest, buildApiUrl, getAccessToken } from "./apiClient";
 
 export async function getProducts() {
   return apiRequest("/api/products/products/", {
@@ -15,16 +15,21 @@ export async function createProduct(productData) {
   });
 }
 
-export async function saveProductImage(productId, imageUrl) {
-  return apiRequest("/api/products/upload-image/", {
+// Sends the actual image file as multipart/form-data
+export async function saveProductImage(productId, file) {
+  const fd = new FormData();
+  fd.append("product", productId);
+  fd.append("image", file);
+
+  const response = await fetch(buildApiUrl("/api/products/upload-image/"), {
     method: "POST",
-    auth: true,
-    body: {
-      product: productId,
-      image: imageUrl,
-    },
-    errorMessage: "Failed to save image",
+    headers: { Authorization: `Bearer ${getAccessToken()}` },
+    body: fd,
   });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.detail || "Failed to save image");
+  return data;
 }
 
 export async function getCategories() {

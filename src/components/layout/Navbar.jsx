@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   FiTruck,
@@ -16,8 +16,9 @@ import { MdCompareArrows } from "react-icons/md";
 import {useAuth} from "../../context/AuthContext";
 
 function Navbar() {
-  const {user,logout}=useAuth();
-  const isLoggedIn =!!user;
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const isLoggedIn = !!user;
 
   return (
     <header className="w-full bg-white">
@@ -85,23 +86,17 @@ function Navbar() {
                 >
                   <FiMessageCircle className="text-2xl" />
                   <span>Chat</span>
-
-                  <span className="absolute -top-3 left-4 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    3
-                  </span>
                 </Link>
 
                 <Link to="/user/notifications" className="relative flex items-center gap-2 font-medium">
                   <FiBell className="text-2xl" />
-                  <span className="absolute -top-3 left-4 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    5
-                  </span>
                 </Link>
               </>
             )}
             {isLoggedIn ? (
               <Link
                 to="/user/profile"
+                state={{ from: location.pathname }}
                 className="flex items-center gap-3 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50"
               >
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">

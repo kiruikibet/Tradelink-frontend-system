@@ -8,20 +8,20 @@ import { useAuth } from "../../context/AuthContext";
 import { useProducts } from "../../hooks/useProducts";
 import Loader from "../../components/common/Loader";
 import EmptyState from "../../components/common/EmptyState";
-import { PRODUCT_PAGE_SIZE } from "../../utils/constants";
 
 function Home() {
   const { user, loading: authLoading } = useAuth();
   const { products, loading: productsLoading, error } = useProducts();
   const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
-  const totalPages = Math.max(1, Math.ceil(products.length / PRODUCT_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * PRODUCT_PAGE_SIZE;
-    return products.slice(start, start + PRODUCT_PAGE_SIZE);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return products.slice(start, start + PAGE_SIZE);
   }, [currentPage, products]);
-  const firstProductNumber = products.length === 0 ? 0 : (currentPage - 1) * PRODUCT_PAGE_SIZE + 1;
-  const lastProductNumber = Math.min(currentPage * PRODUCT_PAGE_SIZE, products.length);
+  const firstProductNumber = products.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const lastProductNumber = Math.min(currentPage * PAGE_SIZE, products.length);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -29,7 +29,7 @@ function Home() {
     }
   }, [currentPage, totalPages]);
 
-  if (authLoading) return <h2 className="p-10">Loading...</h2>;
+  if (authLoading) return <Loader fullScreen />;
 
   return (
     <div className="bg-white min-h-screen">

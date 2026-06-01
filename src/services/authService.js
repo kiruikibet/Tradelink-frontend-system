@@ -33,3 +33,18 @@ export async function updateAvatar(imageUrl) {
     errorMessage: "Failed to update avatar",
   });
 }
+
+export async function updateProfile(data) {
+  return apiRequest("/api/auth/profile/update/", {
+    method: "PATCH",
+    auth: true,
+    body: data,
+    errorMessage: "Failed to update profile",
+  });
+}
+
+export async function checkUsernameAvailable(username) {
+  return apiRequest(`/api/auth/check-username/?username=${encodeURIComponent(username)}`, {
+    errorMessage: "Failed to check username",
+  });
+}
