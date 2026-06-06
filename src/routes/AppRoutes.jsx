@@ -6,6 +6,11 @@ import Profile from "../pages/user/Profile";
 import CreateProduct from "../pages/user/CreateProduct";
 import EditProfile from "../pages/user/EditProfile";
 import ProtectedRoute from "./ProtectedRoute";
+import ForgotPassword from "../pages/public/ForgotPassword"
+import ResetPassword from "../pages/public/ResetPassword";
+
+
+
 
 function AppRoutes() {
   return (
@@ -16,6 +21,8 @@ function AppRoutes() {
       <Route path="/user/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/user/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
       <Route path="/products/create" element={<ProtectedRoute><CreateProduct /></ProtectedRoute>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
     </Routes>
   );
 }
