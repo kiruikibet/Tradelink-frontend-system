@@ -1,5 +1,7 @@
+import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
+// --- Token helpers ---
 export function getAccessToken() {
   return localStorage.getItem("access");
 }
@@ -18,114 +20,92 @@ export function clearAuthTokens() {
   localStorage.removeItem("refresh");
 }
 
-export function buildApiUrl(path) {
-  if (path.startsWith("http")) return path;
-  return `${BASE_URL}${path}`;
-}
+// --- Axios instance ---
+const api = axios.create({
+  baseURL: BASE_URL,
+});
 
-function buildHeaders({ auth = false, body, headers = {} }) {
-  const nextHeaders = { ...headers };
-  if (body && !(body instanceof FormData) && !nextHeaders["Content-Type"]) {
-    nextHeaders["Content-Type"] = "application/json";
+// Attach access token to every request
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  if (auth) {
-    const token = getAccessToken();
-    if (token) nextHeaders.Authorization = `Bearer ${token}`;
-  }
-  return nextHeaders;
+  return config;
+});
+
+// Track whether a refresh is already in progress to avoid loops
+let isRefreshing = false;
+let failedQueue = [];
+
+function processQueue(error, token = null) {
+  failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token)));
+  failedQueue = [];
 }
 
-function buildBody(body) {
-  if (!body || body instanceof FormData || typeof body === "string") return body;
-  return JSON.stringify(body);
-}
+// Intercept 401s, refresh once, then replay the failed request
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-function getErrorMessage(data, fallback) {
-  if (!data) return fallback;
-  if (typeof data === "string") return data;
-  if (data.detail) return data.detail;
-  if (data.message) return data.message;
-  const firstKey = Object.keys(data)[0];
-  const firstValue = firstKey ? data[firstKey] : null;
-  if (Array.isArray(firstValue)) return firstValue[0];
-  if (typeof firstValue === "string") return firstValue;
-  return fallback;
-}
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Queue this request until refresh completes
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
 
-// Attempt to get a new access token using the refresh token
-async function refreshAccessToken() {
-  const refresh = getRefreshToken();
-  if (!refresh) throw new Error("No refresh token");
+      originalRequest._retry = true;
+      isRefreshing = true;
 
-  const res = await fetch(buildApiUrl("/api/auth/refresh/"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh }),
-  });
+      const refresh = getRefreshToken();
+      if (!refresh) {
+        clearAuthTokens();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
 
-  if (!res.ok) {
-    clearAuthTokens();
-    throw new Error("Session expired. Please log in again.");
-  }
-
-  const data = await res.json();
-  localStorage.setItem("access", data.access);
-  return data.access;
-}
-
-export async function apiRequest(path, options = {}) {
-  const {
-    method = "GET",
-    body,
-    auth = false,
-    headers,
-    errorMessage = "Request failed",
-  } = options;
-
-  const doRequest = (token) =>
-    fetch(buildApiUrl(path), {
-      method,
-      headers: buildHeaders({ auth, body, headers,
-        ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
-      }),
-      body: buildBody(body),
-    });
-
-  let response = await fetch(buildApiUrl(path), {
-    method,
-    headers: buildHeaders({ auth, body, headers }),
-    body: buildBody(body),
-  });
-
-  // If 401 and we have auth, try refreshing once
-  if (response.status === 401 && auth) {
-    try {
-      const newToken = await refreshAccessToken();
-      // retry with new token
-      response = await fetch(buildApiUrl(path), {
-        method,
-        headers: buildHeaders({
-          auth: false,
-          body,
-          headers: { ...headers, Authorization: `Bearer ${newToken}` },
-        }),
-        body: buildBody(body),
-      });
-    } catch {
-      clearAuthTokens();
-      window.location.href = "/login";
-      throw new Error("Session expired. Please log in again.");
+      try {
+        const { data } = await axios.post(`${BASE_URL}/api/auth/refresh/`, { refresh });
+        localStorage.setItem("access", data.access);
+        api.defaults.headers.common.Authorization = `Bearer ${data.access}`;
+        processQueue(null, data.access);
+        originalRequest.headers.Authorization = `Bearer ${data.access}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        clearAuthTokens();
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
+    // Extract a readable error message from the response
+    const data = error.response?.data;
+    let message = "Request failed";
+    if (data) {
+      if (typeof data === "string") message = data;
+      else if (data.detail) message = data.detail;
+      else if (data.message) message = data.message;
+      else {
+        const firstKey = Object.keys(data)[0];
+        const firstVal = firstKey ? data[firstKey] : null;
+        if (Array.isArray(firstVal)) message = firstVal[0];
+        else if (typeof firstVal === "string") message = firstVal;
+      }
+    }
+
+    return Promise.reject(new Error(message));
   }
+);
 
-  const contentType = response.headers.get("content-type") || "";
-  const data = contentType.includes("application/json")
-    ? await response.json()
-    : await response.text();
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, errorMessage));
-  }
-
-  return data;
-}
+export default api;

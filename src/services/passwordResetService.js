@@ -1,21 +1,11 @@
-import { apiRequest } from "./apiClient";
+import api from "./apiClient";
 
-export async function forgotPassword(email){
-    return apiRequest("/api/auth/forgot-password/", {
-        method: "POST",
-        body: { email },
-        errorMessage: "Failed to send password reset email."
-    });
+export async function forgotPassword(email) {
+  const { data } = await api.post("/api/auth/forgot-password/", { email });
+  return data;
 }
 
-export async function resetPassword(uid,token,password){
-    return apiRequest("/api/auth/reset-password/", {
-        method: "POST",
-        body: {
-            uid,
-            token,
-            password
-        },
-        errorMessage: "Failed to reset password."
-    });
+export async function resetPassword(uid, token, password) {
+  const { data } = await api.post("/api/auth/reset-password/", { uid, token, password });
+  return data;
 }

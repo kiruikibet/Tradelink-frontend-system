@@ -1,40 +1,29 @@
-import { apiRequest, buildApiUrl, getAccessToken } from "./apiClient";
+import api from "./apiClient";
 
 export async function getProducts() {
-  return apiRequest("/api/products/products/", {
-    errorMessage: "Failed to fetch products",
-  });
+  const { data } = await api.get("/api/products/products/");
+  return data;
 }
 
 export async function createProduct(productData) {
-  return apiRequest("/api/products/products/", {
-    method: "POST",
-    auth: true,
-    body: productData,
-    errorMessage: "Failed to create product",
-  });
+  const { data } = await api.post("/api/products/products/", productData);
+  return data;
 }
 
 export async function deleteProduct(productId) {
-  return apiRequest(`/api/products/products/${productId}/`, {
-    method: "DELETE",
-    auth: true,
-    errorMessage: "Failed to delete product",
-  });
+  await api.delete(`/api/products/products/${productId}/`);
 }
 
 // Saves a Cloudinary image URL to the product
 export async function saveProductImage(productId, imageUrl) {
-  return apiRequest("/api/products/upload-image/", {
-    method: "POST",
-    auth: true,
-    body: { product: productId, image: imageUrl },
-    errorMessage: "Failed to save image",
+  const { data } = await api.post("/api/products/upload-image/", {
+    product: productId,
+    image: imageUrl,
   });
+  return data;
 }
 
 export async function getCategories() {
-  return apiRequest("/api/products/categories/", {
-    errorMessage: "Failed to fetch categories",
-  });
+  const { data } = await api.get("/api/products/categories/");
+  return data;
 }
