@@ -1,0 +1,18 @@
+[33m038c34e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m added some coments
+[33mdd44b8f[m[33m ([m[1;31morigin/main[m[33m)[m  added a forgort password Route and a ResetPassword Route but without styling
+[33m27c31a0[m added editing profile image to happen on backend and delete it in cloudinary
+[33m810442d[m  added edit profile feature
+[33mf490008[m  made some refactoring in services
+[33m2ebffc8[m  removed navbar in account and also made the profile pic be fethed on login
+[33mc2a94fd[m  added cloudinary for image uploads and added pagination of 20 per page
+[33m0126eda[m  removed unused fules and updated the code to their respective files and added the createproduct action
+[33m83b45ba[m  fixed the base api url and added the get products url
+[33m0ae5c16[m fixed the Authorization/Authentication API
+[33m2032a97[m  added authentication files
+[33mf275a3b[m  added a required field on the input of login/register
+[33m4fe1b39[m  made some api for login and register
+[33m4a2afa6[m just added the profile page and updated the sidebar in homepage
+[33m5fbf72b[m added some features but no functionality
+[33m704e4bf[m  created a simple home page skeleton
+[33m9c28db8[m added README.md file
+[33m3ffa0a0[m initial frontend setup

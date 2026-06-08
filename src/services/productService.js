@@ -15,21 +15,22 @@ export async function createProduct(productData) {
   });
 }
 
-// Sends the actual image file as multipart/form-data
-export async function saveProductImage(productId, file) {
-  const fd = new FormData();
-  fd.append("product", productId);
-  fd.append("image", file);
-
-  const response = await fetch(buildApiUrl("/api/products/upload-image/"), {
-    method: "POST",
-    headers: { Authorization: `Bearer ${getAccessToken()}` },
-    body: fd,
+export async function deleteProduct(productId) {
+  return apiRequest(`/api/products/products/${productId}/`, {
+    method: "DELETE",
+    auth: true,
+    errorMessage: "Failed to delete product",
   });
+}
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Failed to save image");
-  return data;
+// Saves a Cloudinary image URL to the product
+export async function saveProductImage(productId, imageUrl) {
+  return apiRequest("/api/products/upload-image/", {
+    method: "POST",
+    auth: true,
+    body: { product: productId, image: imageUrl },
+    errorMessage: "Failed to save image",
+  });
 }
 
 export async function getCategories() {

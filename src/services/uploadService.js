@@ -16,8 +16,8 @@ export async function uploadImage(file) {
     { method: "POST", body: fd }
   );
 
-  if (!res.ok) throw new Error("Image upload failed");
   const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || "Image upload failed");
   return {
     url: data.secure_url,
     public_id: data.public_id,

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiX } from "react-icons/fi";
 import { MAX_PRODUCT_IMAGES } from "../../utils/constants";
 import { uploadImage } from "../../services/uploadService";
-import { createProduct, saveProductImage, getCategories } from "../../services/productService";
+import { createProduct, deleteProduct, saveProductImage, getCategories } from "../../services/productService";
 
 function CreateProduct() {
   const navigate = useNavigate();
@@ -53,9 +53,10 @@ function CreateProduct() {
     }
 
     setSubmitting(true);
+    let product = null;
     try {
       setUploadProgress("Creating product...");
-      const product = await createProduct({
+      product = await createProduct({
         name: form.name,
         description: form.description,
         price: parseFloat(form.price),
@@ -64,13 +65,21 @@ function CreateProduct() {
 
       for (let i = 0; i < selectedFiles.length; i++) {
         setUploadProgress(`Uploading image ${i + 1} of ${selectedFiles.length}...`);
-        const imageUrl = await uploadImage(selectedFiles[i]);
-        await saveProductImage(product.product_id, imageUrl);
+        const { url } = await uploadImage(selectedFiles[i]);
+        await saveProductImage(product.product_id, url);
       }
 
       navigate("/user/profile");
     } catch (err) {
-      setError(err.message);
+      // Roll back the product if it was created but images failed
+      if (product?.product_id) {
+        try {
+          await deleteProduct(product.product_id);
+        } catch {
+          // rollback best-effort, ignore secondary error
+        }
+      }
+      setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
       setUploadProgress("");
