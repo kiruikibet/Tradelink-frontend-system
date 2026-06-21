@@ -1,24 +1,30 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   FiTruck,
   FiRefreshCw,
   FiPhone,
   FiSearch,
   FiHeart,
-  FiShoppingCart,
   FiUser,
-  FiChevronDown,
   FiMessageCircle,
   FiBell,
 } from "react-icons/fi";
-import { MdCompareArrows } from "react-icons/md";
 import {useAuth} from "../../context/AuthContext";
 
 function Navbar() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isLoggedIn = !!user;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className="w-full bg-white">
@@ -63,17 +69,18 @@ function Navbar() {
 
           {/* Category + Search */}
           <div className="flex-1 hidden lg:flex items-center gap-4">
-            <div className="flex flex-1 h-12 border border-gray-300 rounded-lg overflow-hidden">
+            <form onSubmit={handleSearch} className="flex flex-1 h-12 border border-gray-300 rounded-lg overflow-hidden">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands and more..."
                 className="flex-1 px-5 outline-none text-gray-700"
               />
-
-              <button className="w-16 bg-green-800 text-white flex items-center justify-center text-xl">
+              <button type="submit" className="w-16 bg-green-800 text-white flex items-center justify-center text-xl">
                 <FiSearch />
               </button>
-            </div>
+            </form>
           </div>
 
           {/* Right Actions */}
@@ -130,20 +137,18 @@ function Navbar() {
       {/* Bottom Nav Links */}
       <nav className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center gap-10 overflow-x-auto text-sm font-semibold">
-          <a href="#">Deals</a>
-          <a href="#">New Arrivals</a>
-          <a href="#">Best Sellers</a>
-          <a href="#">Electronics</a>
-          <a href="#">Phones</a>
-          <a href="#">Home & Kitchen</a>
-          <a href="#">Fashion</a>
-          <a href="#">Beauty</a>
-          <a href="#">Sports</a>
-          <a href="#">Toys & Games</a>
-          <a href="#">Automotive</a>
-          <a href="#" className="flex items-center gap-1">
-            More <FiChevronDown />
-          </a>
+          <Link to="/" className="hover:text-green-700 transition whitespace-nowrap">Deals</Link>
+          <Link to="/search?q=new" className="hover:text-green-700 transition whitespace-nowrap">New Arrivals</Link>
+          <Link to="/search?q=best" className="hover:text-green-700 transition whitespace-nowrap">Best Sellers</Link>
+          <Link to="/category/Electronics" className="hover:text-green-700 transition whitespace-nowrap">Electronics</Link>
+          <Link to="/category/Phones" className="hover:text-green-700 transition whitespace-nowrap">Phones</Link>
+          <Link to="/category/Home & Kitchen" className="hover:text-green-700 transition whitespace-nowrap">Home & Kitchen</Link>
+          <Link to="/category/Fashion" className="hover:text-green-700 transition whitespace-nowrap">Fashion</Link>
+          <Link to="/category/Beauty" className="hover:text-green-700 transition whitespace-nowrap">Beauty</Link>
+          <Link to="/category/Sports" className="hover:text-green-700 transition whitespace-nowrap">Sports</Link>
+          <Link to="/user/saved" className="hover:text-green-700 transition whitespace-nowrap flex items-center gap-1">
+            <FiHeart size={14} /> Saved
+          </Link>
         </div>
       </nav>
     </header>

@@ -23,7 +23,7 @@ function ProductCard({ product }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
       {/* Image */}
-      <Link to={`/product/${id}`} className="block relative bg-gray-50">
+      <Link to={`/products/${id}`} className="block relative bg-gray-50">
         <button className="absolute top-3 right-3 bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-gray-500 hover:text-red-500 z-10">
           <FiHeart />
         </button>
@@ -39,7 +39,7 @@ function ProductCard({ product }) {
 
       {/* Content */}
       <div className="p-3">
-        <Link to={`/product/${id}`}>
+        <Link to={`/products/${id}`}>
           <h3 className="text-sm font-medium text-gray-800 truncate hover:text-green-700">
             {name}
           </h3>
@@ -68,7 +68,7 @@ function ProductCard({ product }) {
         )}
 
         <Link
-          to={`/messages?product=${id}`}
+          to={`/user/messages/${seller}`}
           className="mt-3 w-full bg-green-700 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-green-800"
         >
           <FiMessageCircle />
