@@ -1,12 +1,13 @@
 import api, { setAuthTokens } from "./apiClient";
 
-export async function registerUser(username, first_name, last_name, email, password) {
+export async function registerUser(username, first_name, last_name, email, password, account_type = "buyer") {
   const { data } = await api.post("/api/auth/register/", {
     username,
     first_name,
     last_name,
     email,
     password,
+    account_type,
   });
   return data;
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FiArrowLeft, FiLock } from "react-icons/fi";
 import PageShell from "../../components/layout/PageShell";
 import Button from "../../components/common/Button";
+import { payAgreement } from "../../services/marketplaceService";
 
 function BookingPayment() {
   const navigate = useNavigate();
@@ -15,8 +16,12 @@ function BookingPayment() {
   const handlePay = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    // TODO: call booking deposit payment API
-    setTimeout(() => navigate("/user/payment/success"), 1500);
+    try {
+      await payAgreement({ agreement: agreementId, method: "mpesa", phone });
+      navigate("/user/payment/success");
+    } catch {
+      navigate("/user/payment/failed");
+    }
   };
 
   return (

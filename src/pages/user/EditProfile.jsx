@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { uploadImage } from "../../services/uploadService";
 import { updateAvatar, updateProfile, checkUsernameAvailable } from "../../services/authService";
 import Loader from "../../components/common/Loader";
+import AccountNavbar from "../../components/layout/AccountNavbar";
 
 function EditProfile() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ function EditProfile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [usernameStatus, setUsernameStatus] = useState(""); // "checking" | "taken" | "available" | ""
+  const [usernameAvailability, setUsernameAvailability] = useState(""); // "checking" | "taken" | "available" | ""
 
   const [form, setForm] = useState({
     username: user?.username || "",
@@ -27,21 +28,21 @@ function EditProfile() {
 
   // debounce username check
   useEffect(() => {
-    if (!form.username || form.username === user?.username) {
-      setUsernameStatus("");
-      return;
-    }
-    setUsernameStatus("checking");
+    if (!form.username || form.username === user?.username) return;
+
     const timer = setTimeout(async () => {
       try {
         const res = await checkUsernameAvailable(form.username);
-        setUsernameStatus(res.available ? "available" : "taken");
+        setUsernameAvailability(res.available ? "available" : "taken");
       } catch {
-        setUsernameStatus("");
+        setUsernameAvailability("");
       }
     }, 500);
     return () => clearTimeout(timer);
   }, [form.username, user?.username]);
+
+  const usernameStatus =
+    !form.username || form.username === user?.username ? "" : usernameAvailability;
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
@@ -98,8 +99,9 @@ function EditProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <AccountNavbar />
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-100">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             type="button"
@@ -159,7 +161,13 @@ function EditProfile() {
               <input
                 type="text"
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase().replace(/\s/g, "") })}
+                onChange={(e) => {
+                  const username = e.target.value.toLowerCase().replace(/\s/g, "");
+                  setForm({ ...form, username });
+                  setUsernameAvailability(
+                    !username || username === user?.username ? "" : "checking"
+                  );
+                }}
                 className="w-full text-sm text-gray-900 outline-none bg-transparent"
                 placeholder="username"
               />

@@ -6,6 +6,7 @@ import Loader from "../../components/common/Loader";
 import Button from "../../components/common/Button";
 import api from "../../services/apiClient";
 import { useAuth } from "../../context/AuthContext";
+import { startConversation } from "../../services/marketplaceService";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -15,6 +16,7 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeImage, setActiveImage] = useState(0);
+  const [startingChat, setStartingChat] = useState(false);
 
   useEffect(() => {
     api
@@ -97,10 +99,22 @@ function ProductDetails() {
             <div className="flex flex-col gap-3 pt-2">
               {user && user.username !== product.user ? (
                 <Button
-                  onClick={() => navigate(`/user/messages/${product.user}`)}
+                  onClick={async () => {
+                    setStartingChat(true);
+                    try {
+                      const conversation = await startConversation({
+                        seller: product.user,
+                        product: product.product_id,
+                      });
+                      navigate(`/user/messages/${conversation.id}`);
+                    } finally {
+                      setStartingChat(false);
+                    }
+                  }}
+                  disabled={startingChat}
                   className="w-full flex items-center justify-center gap-2"
                 >
-                  <FiMessageCircle /> Chat with Seller
+                  <FiMessageCircle /> {startingChat ? "Opening Chat..." : "Chat with Seller"}
                 </Button>
               ) : !user ? (
                 <Button onClick={() => navigate("/login")} className="w-full">

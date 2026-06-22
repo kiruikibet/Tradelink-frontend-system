@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { capitalize } from "../../utils/helpers";
 import { validateRegister } from "../../utils/validators";
 
 function Register() {
@@ -15,6 +14,7 @@ function Register() {
     email: '',
     password: '',
     password2: '',
+    account_type: "buyer",
     agreeTerms: false,
   });
   const [error, setError] = useState(''); 
@@ -46,8 +46,8 @@ const handleChange = (e) => {
   }
 
   try {
-    await register(formData.username, formData.first_name, formData.last_name, formData.email, formData.password);
-    navigate("/");
+    await register(formData.username, formData.first_name, formData.last_name, formData.email, formData.password, formData.account_type);
+    navigate("/login");
   } catch (error) {
     setError(error.message);
   }
@@ -130,6 +130,19 @@ const handleChange = (e) => {
                 placeholder="Enter email"
                 className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Account Type</label>
+              <select
+                name="account_type"
+                value={formData.account_type}
+                onChange={handleChange}
+                className="mt-2 w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-green-700"
+              >
+                <option value="buyer">Buyer</option>
+                <option value="seller">Seller</option>
+              </select>
             </div>
 
             <div>

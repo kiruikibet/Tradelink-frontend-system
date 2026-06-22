@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FiArrowLeft, FiLock } from "react-icons/fi";
 import PageShell from "../../components/layout/PageShell";
 import Button from "../../components/common/Button";
+import { payAgreement } from "../../services/marketplaceService";
 
 function PaymentPage() {
   const navigate = useNavigate();
@@ -16,10 +17,12 @@ function PaymentPage() {
   const handlePay = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    // TODO: call payment API
-    setTimeout(() => {
+    try {
+      await payAgreement({ agreement: agreementId, method, phone });
       navigate("/user/payment/success");
-    }, 1500);
+    } catch {
+      navigate("/user/payment/failed");
+    }
   };
 
   return (

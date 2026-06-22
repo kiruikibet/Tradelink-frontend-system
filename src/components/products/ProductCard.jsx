@@ -80,7 +80,6 @@ function ProductCard({ product }) {
 }
 
 export function ProfileProductCard({ product }) {
-  const id = product.product_id ?? product.id;
   const firstImage = resolveImage(product.images?.[0]?.image ?? null);
   const fallback = "🛍️";
   const price = product.price

@@ -1,11 +1,21 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiAlertTriangle } from "react-icons/fi";
 import PageShell from "../../components/layout/PageShell";
+import Loader from "../../components/common/Loader";
+import { getDispute } from "../../services/marketplaceService";
 
 function DisputeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // TODO: fetch dispute from API
+  const [dispute, setDispute] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDispute(id).then(setDispute).finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return <PageShell><Loader fullScreen /></PageShell>;
 
   return (
     <PageShell>
@@ -19,10 +29,15 @@ function DisputeDetails() {
             <FiAlertTriangle className="text-2xl text-yellow-500" />
             <h2 className="text-xl font-bold">Dispute Details</h2>
           </div>
-          <p className="text-sm text-gray-400 mb-8">Dispute #{id}</p>
-          <p className="text-center text-gray-400 py-10 text-sm">
-            Dispute data will appear here once connected to the API.
-          </p>
+          <p className="text-sm text-gray-400 mb-6">Dispute #{id}</p>
+          <div className="space-y-3 text-sm">
+            <p><span className="font-semibold">Product:</span> {dispute.product_name}</p>
+            <p><span className="font-semibold">Opened by:</span> {dispute.opened_by}</p>
+            <p><span className="font-semibold">Status:</span> {dispute.status.replaceAll("_", " ")}</p>
+            <p><span className="font-semibold">Reason:</span> {dispute.reason}</p>
+            {dispute.evidence && <p><span className="font-semibold">Evidence:</span> {dispute.evidence}</p>}
+            {dispute.resolution && <p><span className="font-semibold">Resolution:</span> {dispute.resolution}</p>}
+          </div>
         </div>
       </div>
     </PageShell>

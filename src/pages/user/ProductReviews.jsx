@@ -1,10 +1,9 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiStar } from "react-icons/fi";
 import PageShell from "../../components/layout/PageShell";
 import EmptyState from "../../components/common/EmptyState";
 
 function ProductReviews() {
-  const { id } = useParams();
   const navigate = useNavigate();
   // TODO: fetch reviews from API
   const reviews = [];

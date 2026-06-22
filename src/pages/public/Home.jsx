@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import HeroSection from "../../components/home/Hero";
 import ProductGrid from "../../components/products/ProductGrid";
@@ -18,17 +18,13 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
 
   // Slice only the products that belong on the current page.
   const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
+    const start = (safeCurrentPage - 1) * PAGE_SIZE;
     return products.slice(start, start + PAGE_SIZE);
-  }, [currentPage, products]);
-
-  // If a data change removes the current page, fall back to the last valid page.
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [currentPage, totalPages]);
+  }, [safeCurrentPage, products]);
 
   if (authLoading) return <Loader fullScreen />;
 
@@ -94,12 +90,12 @@ function Home() {
                       Previous
                     </button>
                     <span className="min-w-20 text-center text-sm font-semibold text-gray-700">
-                      {currentPage} / {totalPages}
+                      {safeCurrentPage} / {totalPages}
                     </span>
                     <button
                     type="button"
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
+                      disabled={safeCurrentPage === totalPages}
                       className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-green-600 hover:text-green-700 transition"
                     >
                       Next

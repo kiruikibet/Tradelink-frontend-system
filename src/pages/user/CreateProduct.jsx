@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiX } from "react-icons/fi";
+import { FiArrowLeft, FiImage, FiShield, FiX } from "react-icons/fi";
 import { MAX_PRODUCT_IMAGES } from "../../utils/constants";
 import { uploadImage } from "../../services/uploadService";
 import { createProduct, deleteProduct, saveProductImage, getCategories } from "../../services/productService";
+import { useAuth } from "../../context/AuthContext";
+import { VERIFICATION_COPY } from "../../services/marketplaceService";
+import AccountNavbar from "../../components/layout/AccountNavbar";
 
 function CreateProduct() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [categories, setCategories] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
@@ -25,6 +29,11 @@ function CreateProduct() {
     getCategories().then(setCategories).catch(() => {});
   }, []);
 
+  const verificationStatus = user?.verification_status || "not_submitted";
+  const isVerifiedSeller = verificationStatus === "verified";
+  const verificationCopy =
+    VERIFICATION_COPY[verificationStatus] || VERIFICATION_COPY.not_submitted;
+
   const handleFileChange = (e) => {
     const incoming = Array.from(e.target.files);
     const combined = [...selectedFiles, ...incoming].slice(0, MAX_PRODUCT_IMAGES);
@@ -42,6 +51,11 @@ function CreateProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!isVerifiedSeller) {
+      setError("Seller verification is required before publishing listings.");
+      return;
+    }
 
     if (!form.name || !form.price || !form.category) {
       setError("Name, price, and category are required.");
@@ -69,7 +83,7 @@ function CreateProduct() {
         await saveProductImage(product.product_id, url);
       }
 
-      navigate("/user/profile");
+      navigate("/seller/listings");
     } catch (err) {
       // Roll back the product if it was created but images failed
       if (product?.product_id) {
@@ -86,10 +100,52 @@ function CreateProduct() {
     }
   };
 
+  if (!isVerifiedSeller) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <AccountNavbar />
+        <div className="bg-white border-b border-gray-100">
+          <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/seller/dashboard")}
+              className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition"
+            >
+              <FiArrowLeft size={18} />
+            </button>
+            <h1 className="text-base font-bold text-gray-900">New Listing</h1>
+          </div>
+        </div>
+
+        <div className="flex-1 max-w-2xl w-full mx-auto px-4 py-8">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
+            <div className="w-14 h-14 rounded-xl bg-green-50 text-green-700 flex items-center justify-center text-2xl mx-auto mb-4">
+              <FiShield />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">
+              Verify your seller account
+            </h2>
+            <p className="text-sm text-gray-500 mt-2">
+              {verificationCopy.description}
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate("/seller/dashboard")}
+              className="mt-5 bg-green-700 hover:bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold transition"
+            >
+              Go to Seller Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <AccountNavbar />
       {/* Sticky top bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-100">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
           <button
             type="button"
@@ -144,7 +200,7 @@ function CreateProduct() {
                 htmlFor="image-upload"
                 className="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-200 rounded-xl p-5 cursor-pointer hover:border-green-500 hover:bg-green-50 transition"
               >
-                <span className="text-2xl mb-1">🖼️</span>
+                <FiImage className="text-2xl mb-1 text-gray-500" />
                 <p className="text-sm text-gray-500 font-medium">
                   {previews.length === 0 ? "Add photos" : "Add more"}
                 </p>

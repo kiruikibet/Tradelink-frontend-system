@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser, getProfile } from "../services/authService";
 import { clearAuthTokens, getAccessToken } from "../services/apiClient";
@@ -14,8 +15,8 @@ export function AuthProvider({ children }) {
     setUser(profile.user);
   }
 
-  async function register(username, first_name, last_name, email, password) {
-    await registerUser(username, first_name, last_name, email, password);
+  async function register(username, first_name, last_name, email, password, accountType = "buyer") {
+    await registerUser(username, first_name, last_name, email, password, accountType);
     await login(username, password);
   }
 

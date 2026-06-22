@@ -1,25 +1,20 @@
 import Footer from "../../components/layout/Footer";
+import AccountNavbar from "../../components/layout/AccountNavbar";
 import { ProfileProductGrid } from "../../components/products/ProductGrid";
 import { useAuth } from "../../context/AuthContext";
 import { useProducts } from "../../hooks/useProducts";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { FiArrowLeft, FiMapPin, FiLogOut } from "react-icons/fi";
+import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { FiHome, FiMapPin, FiLogOut } from "react-icons/fi";
 import Loader from "../../components/common/Loader";
 import EmptyState from "../../components/common/EmptyState";
 
 function Profile() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const fromPath = location.state?.from ?? "/";
   const { user, loading, logout } = useAuth();
   const { products: allProducts, loading: productsLoading } = useProducts();
   const [activeTab, setActiveTab] = useState("listings");
-  const [avatarUrl, setAvatarUrl] = useState(user?.profile_picture || null);
-
-  useEffect(() => {
-    setAvatarUrl(user?.profile_picture || null);
-  }, [user?.profile_picture]);
+  const avatarUrl = user?.profile_picture || null;
 
   if (loading) return <Loader fullScreen />;
   if (!user) { navigate("/login"); return null; }
@@ -37,17 +32,18 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AccountNavbar />
       <div className="w-full bg-gradient-to-br from-green-900 via-green-800 to-gray-900">
 
         {/* Top bar */}
         <div className="max-w-7xl mx-auto px-4 md:px-6 pt-4 flex items-center justify-between">
           <button
             type="button"
-            onClick={() => navigate(fromPath)}
+            onClick={() => navigate("/")}
             className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/15 border border-white/15 rounded-lg px-3 py-2 transition"
           >
-            <FiArrowLeft size={15} />
-            Back
+            <FiHome size={15} />
+            Home
           </button>
           <button
             onClick={() => { logout(); navigate("/"); }}
